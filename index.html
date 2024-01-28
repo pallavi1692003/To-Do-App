@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #app {
+            max-width: 80%;
+            width: 100%;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            padding: 20px 0;
+            background-color: #4285f4;
+            color: #fff;
+            margin: 0;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin: 10px;
+            height: 42px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #59ab59;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: medium;
+            margin: 7px;
+        }
+
+        h2 {
+            background-color: #6e7787;
+            color: #fff;
+            margin: 5px;
+            padding: 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            border-bottom: 1px solid #ccc;
+            background-color: #fff;
+        }
+
+        li.completed {
+            background-color: #e0e0e0;
+        }
+
+        button.task-action {
+            background-color: #4285f4;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            margin-left: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>To-Do App</h1>
+        <input type="text" id="taskInput" placeholder="Add a new task">
+        <button onclick="addTask()">Add Task</button>
+        
+        <h2>Pending Tasks</h2>
+        <ul id="pendingTasks"></ul>
+
+        <h2>Completed Tasks</h2>
+        <ul id="completedTasks"></ul>
+    </div>
+
+    <script>
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskText = taskInput.value.trim();
+
+            if (taskText === '') {
+                alert('Please enter a task.');
+                return;
+            }
+
+            const taskItem = createTaskItem(taskText);
+            document.getElementById('pendingTasks').appendChild(taskItem);
+            
+            taskInput.value = '';
+        }
+
+        function createTaskItem(text) {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span>${text}</span>
+                <div>
+                    <button onclick="completeTask(this.parentNode.parentNode)">Complete</button>
+                    <button onclick="editTask(this.parentNode.parentNode)">Edit</button>
+                    <button onclick="deleteTask(this.parentNode.parentNode)">Delete</button>
+                </div>
+            `;
+            return li;
+        }
+
+        function completeTask(taskItem) {
+            taskItem.classList.toggle('completed');
+            const targetList = taskItem.classList.contains('completed') ? 'completedTasks' : 'pendingTasks';
+            document.getElementById(targetList).appendChild(taskItem);
+        }
+
+        function editTask(taskItem) {
+            const newText = prompt('Edit task:', taskItem.querySelector('span').textContent);
+            if (newText !== null) {
+                taskItem.querySelector('span').textContent = newText;
+            }
+        }
+
+        function deleteTask(taskItem) {
+            taskItem.parentNode.removeChild(taskItem);
+        }
+    </script>
+</body>
+</html>
