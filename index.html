@@ -108,6 +108,16 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load tasks from localStorage when the page loads
+            const pendingTasks = JSON.parse(localStorage.getItem('pendingTasks')) || [];
+            const completedTasks = JSON.parse(localStorage.getItem('completedTasks')) || [];
+
+            // Render tasks
+            renderTasks('pendingTasks', pendingTasks);
+            renderTasks('completedTasks', completedTasks);
+        });
+
         function addTask() {
             const taskInput = document.getElementById('taskInput');
             const taskText = taskInput.value.trim();
@@ -120,6 +130,9 @@
             const taskItem = createTaskItem(taskText);
             document.getElementById('pendingTasks').appendChild(taskItem);
             
+            // Save updated pending tasks to localStorage
+            saveTasks('pendingTasks');
+            
             taskInput.value = '';
         }
 
@@ -128,9 +141,9 @@
             li.innerHTML = `
                 <span>${text}</span>
                 <div>
-                    <button onclick="completeTask(this.parentNode.parentNode)">Complete</button>
-                    <button onclick="editTask(this.parentNode.parentNode)">Edit</button>
-                    <button onclick="deleteTask(this.parentNode.parentNode)">Delete</button>
+                    <button class="task-action" onclick="completeTask(this.parentNode.parentNode)">Complete</button>
+                    <button class="task-action" onclick="editTask(this.parentNode.parentNode)">Edit</button>
+                    <button class="task-action" onclick="deleteTask(this.parentNode.parentNode)">Delete</button>
                 </div>
             `;
             return li;
@@ -140,17 +153,41 @@
             taskItem.classList.toggle('completed');
             const targetList = taskItem.classList.contains('completed') ? 'completedTasks' : 'pendingTasks';
             document.getElementById(targetList).appendChild(taskItem);
+
+            // Save updated tasks to localStorage
+            saveTasks('pendingTasks');
+            saveTasks('completedTasks');
         }
 
         function editTask(taskItem) {
             const newText = prompt('Edit task:', taskItem.querySelector('span').textContent);
             if (newText !== null) {
                 taskItem.querySelector('span').textContent = newText;
+                // Save updated tasks to localStorage
+                saveTasks('pendingTasks');
+                saveTasks('completedTasks');
             }
         }
 
         function deleteTask(taskItem) {
             taskItem.parentNode.removeChild(taskItem);
+            // Save updated tasks to localStorage
+            saveTasks('pendingTasks');
+            saveTasks('completedTasks');
+        }
+
+        function saveTasks(taskType) {
+            const tasks = Array.from(document.getElementById(taskType).children).map(task => task.querySelector('span').textContent);
+            localStorage.setItem(taskType, JSON.stringify(tasks));
+        }
+
+        function renderTasks(taskType, tasks) {
+            const taskList = document.getElementById(taskType);
+            taskList.innerHTML = '';
+            tasks.forEach(taskText => {
+                const taskItem = createTaskItem(taskText);
+                taskList.appendChild(taskItem);
+            });
         }
     </script>
 </body>
